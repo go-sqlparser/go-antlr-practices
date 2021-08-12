@@ -6,15 +6,17 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
-	"github.com/go-sqlparser/goadvent-antlr/parser"
+	"github.com/go-sqlparser/antlr4-grammars/dot"
 )
 
 func main() {
 	// Setup the input
-	is := antlr.NewInputStream("22 * (34 + 56)")
+	// https://pkg.go.dev/github.com/antlr/antlr4/runtime/Go/antlr#NewFileStream
+	is, _ := antlr.NewFileStream("../sales.xo.dot")
 
 	// Create the Lexer
-	lexer := parser.NewCalcLexer(is)
+	// https://pkg.go.dev/github.com/go-sqlparser/antlr4-grammars
+	lexer := dot.NewDOTLexer(is)
 
 	// Read all tokens
 	for {
