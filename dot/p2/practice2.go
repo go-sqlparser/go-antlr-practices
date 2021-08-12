@@ -3,23 +3,16 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
+	"github.com/go-sqlparser/antlr4-grammars/dot"
 	"github.com/go-sqlparser/goadvent-antlr/parser"
 )
 
-type calcListener struct {
-	*parser.BaseCalcListener
-	lexer *parser.CalcLexer
-}
-
-// ExitParentheses is called when exiting the Parentheses pair.
-func (l *calcListener) ExitParentheses(c *parser.ParenthesesContext) {
-	//fmt.Printf("%#v\n", c)
-	fmt.Printf("%#v {%q}\n",
-		c.Expression(), c.GetText())
+type dotListener struct {
+	*dot.BaseDOTListener
+	lexer *dot.DOTLexer
 }
 
 // ExitMulDiv is called when exiting the MulDiv production.
@@ -29,18 +22,64 @@ func (l *calcListener) ExitMulDiv(c *parser.MulDivContext) {
 		l.lexer.SymbolicNames[c.GetOp().GetTokenType()], c.GetText())
 }
 
-// ExitAddSub is called when exiting the AddSub production.
-func (l *calcListener) ExitAddSub(c *parser.AddSubContext) {
-	//fmt.Printf("%#v\n", c)
-	fmt.Printf("%s {%q}\n",
-		l.lexer.SymbolicNames[c.GetOp().GetTokenType()], c.GetText())
+// ExitEveryRule is called when any rule is exited.
+func (s *dotListener) ExitEveryRule(ctx antlr.ParserRuleContext) {
 }
 
-// ExitNumber is called when exiting the Number production.
-func (l *calcListener) ExitNumber(c *parser.NumberContext) {
-	//fmt.Printf("%#v\n", c)
-	i, _ := strconv.Atoi(c.GetText())
-	fmt.Printf("NUMBER {%d}\n", i)
+// ExitGraph is called when production graph is exited.
+func (s *dotListener) ExitGraph(ctx *dot.GraphContext) {
+}
+
+// ExitStmt_list is called when production stmt_list is exited.
+func (s *dotListener) ExitStmt_list(ctx *dot.Stmt_listContext) {
+}
+
+// ExitStmt is called when production stmt is exited.
+func (s *dotListener) ExitStmt(ctx *dot.StmtContext) {
+}
+
+// ExitAttr_stmt is called when production attr_stmt is exited.
+func (s *dotListener) ExitAttr_stmt(ctx *dot.Attr_stmtContext) {
+}
+
+// ExitAttr_list is called when production attr_list is exited.
+func (s *dotListener) ExitAttr_list(ctx *dot.Attr_listContext) {
+}
+
+// ExitA_list is called when production a_list is exited.
+func (s *dotListener) ExitA_list(ctx *dot.A_listContext) {
+}
+
+// ExitEdge_stmt is called when production edge_stmt is exited.
+func (s *dotListener) ExitEdge_stmt(ctx *dot.Edge_stmtContext) {
+}
+
+// ExitEdgeRHS is called when production edgeRHS is exited.
+func (s *dotListener) ExitEdgeRHS(ctx *dot.EdgeRHSContext) {
+}
+
+// ExitEdgeop is called when production edgeop is exited.
+func (s *dotListener) ExitEdgeop(ctx *dot.EdgeopContext) {
+}
+
+// ExitNode_stmt is called when production node_stmt is exited.
+func (s *dotListener) ExitNode_stmt(ctx *dot.Node_stmtContext) {
+}
+
+// ExitNode_id is called when production node_id is exited.
+func (s *dotListener) ExitNode_id(ctx *dot.Node_idContext) {
+}
+
+// ExitPort is called when production port is exited.
+func (s *dotListener) ExitPort(ctx *dot.PortContext) {
+}
+
+// ExitSubgraph is called when production subgraph is exited.
+func (s *dotListener) ExitSubgraph(ctx *dot.SubgraphContext) {
+}
+
+// ExitId is called when production id is exited.
+func (s *dotListener) ExitId(ctx *dot.IdContext) {
 }
 
 func main() {
