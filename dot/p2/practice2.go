@@ -7,23 +7,21 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
 	"github.com/go-sqlparser/antlr4-grammars/dot"
-	"github.com/go-sqlparser/goadvent-antlr/parser"
 )
 
 type dotListener struct {
 	*dot.BaseDOTListener
-	lexer *dot.DOTLexer
-}
-
-// ExitMulDiv is called when exiting the MulDiv production.
-func (l *calcListener) ExitMulDiv(c *parser.MulDivContext) {
-	//fmt.Printf("%#v\n", c)
-	fmt.Printf("%s {%q}\n",
-		l.lexer.SymbolicNames[c.GetOp().GetTokenType()], c.GetText())
+	//lexer  *dot.DOTLexer
+	parser *dot.DOTParser
 }
 
 // ExitEveryRule is called when any rule is exited.
 func (s *dotListener) ExitEveryRule(ctx antlr.ParserRuleContext) {
+	//fmt.Printf("%#v\n", ctx)
+	rc := ctx.GetRuleContext()
+	ri := rc.GetRuleIndex()
+	//fmt.Printf("%#v\n", rc)
+	fmt.Printf("%s (%s)\n", s.parser.RuleNames[ri], ctx.GetText())
 }
 
 // ExitGraph is called when production graph is exited.
@@ -84,30 +82,55 @@ func (s *dotListener) ExitId(ctx *dot.IdContext) {
 
 func main() {
 	// Setup the input
-	is := antlr.NewInputStream("12 * (34 - 56)")
-	//is := antlr.NewInputStream("1 + 2 * 3")
+	is, _ := antlr.NewFileStream("../sales.xo.dot")
 
 	// Create the Lexer
-	lexer := parser.NewCalcLexer(is)
+	lexer := dot.NewDOTLexer(is)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 
 	// Create the Parser
-	p := parser.NewCalcParser(stream)
+	p := dot.NewDOTParser(stream)
 
 	// Finally parse the expression (by walking the tree)
-	listener := calcListener{}
-	listener.lexer = lexer
-	antlr.ParseTreeWalkerDefault.Walk(&listener, p.Start())
+	listener := dotListener{}
+	//listener.lexer = lexer
+	listener.parser = p
+	antlr.ParseTreeWalkerDefault.Walk(&listener, p.Graph())
 }
 
 /*
 
-$ go run example2.go
-NUMBER {12}
-NUMBER {34}
-NUMBER {56}
-SUB {"34-56"}
-&parser.AddSubContext{ExpressionContext:(*parser.ExpressionContext)(...), op:(*antlr.CommonToken)(...)} {"(34-56)"}
-MUL {"12*(34-56)"}
+$ p2
+id (dbo)
+id (shape)
+id (none)
+id (margin)
+id (0)
+a_list (shape=none,margin=0)
+attr_list ([shape=none,margin=0])
+attr_stmt (node[shape=none,margin=0])
+stmt (node[shape=none,margin=0])
+id ("dbo.Customer")
+node_id ("dbo.Customer")
+id (label)
+id (<
+                <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue">"dbo.Customer"</td></tr>
+                <tr><td align="left" PORT="CustomerID">CustomerID: int</td></tr>
+                <tr><td align="left" PORT="Name">Name: varchar</td></tr>
+                <tr><td align="left" PORT="Address1">Address1: varchar</td></tr>
+                <tr><td align="left" PORT="Address2">Address2: varchar</td></tr>
+                <tr><td align="left" PORT="Address3">Address3: varchar</td></tr>
+                </table>>)
+a_list (label=<
+                <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="lightblue">"dbo.Customer"</td></tr>
+                <tr><td align="left" PORT="CustomerID">CustomerID: int</td></tr>
+                <tr><td align="left" PORT="Name">Name: varchar</td></tr>
+                <tr><td align="left" PORT="Address1">Address1: varchar</td></tr>
+                <tr><td align="left" PORT="Address2">Address2: varchar</td></tr>
+                <tr><td align="left" PORT="Address3">Address3: varchar</td></tr>
+                </table>>)
+. . .
 
 */
