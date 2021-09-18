@@ -9,11 +9,13 @@ import (
 @parser::members {
 
 func eval(left int, op antlr.Token, right int) int {
-    if   (op.GetText() == "*") {
+    if (op.GetTokenType() == ExprParserMUL) {
         return left * right
-    } else if (op.GetText() == "+") {
+    } else if (op.GetTokenType() == ExprParserDIV) {
+        return left / right
+    } else if (op.GetTokenType() == ExprParserADD) {
         return left + right
-    } else if (op.GetText() == "-") {
+    } else if (op.GetTokenType() == ExprParserSUB) {
         return left - right
     } else {
         return 0
@@ -26,9 +28,10 @@ stat:   e NEWLINE
     ;
 
 e returns [int v]
-    : a=e op=('+'|'-') b=e  {
+    : a=e op=('+'|'-'|'*'|'/') b=e  {
                 $v = eval($a.v, $op, $b.v)
-                fmt.Fprintf(os.Stdout, "got args=%d %d\n", $a.v, $b.v)
+                fmt.Fprintf(os.Stdout, "%d %s %d = %d\n",
+			$a.v, $op.GetText(), $b.v, $v)
                 }
     | INT                   {
                 $v = $INT.int

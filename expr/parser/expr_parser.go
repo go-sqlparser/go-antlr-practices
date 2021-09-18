@@ -21,7 +21,7 @@ var parserATN = []uint16{
 	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 10, 27, 4,
 	2, 9, 2, 4, 3, 9, 3, 3, 2, 3, 2, 3, 2, 3, 2, 5, 2, 11, 10, 2, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 3, 22, 10, 3, 12, 3, 14,
-	3, 25, 11, 3, 3, 3, 2, 3, 4, 4, 2, 4, 2, 3, 3, 2, 5, 6, 2, 26, 2, 10, 3,
+	3, 25, 11, 3, 3, 3, 2, 3, 4, 4, 2, 4, 2, 3, 3, 2, 3, 6, 2, 26, 2, 10, 3,
 	2, 2, 2, 4, 12, 3, 2, 2, 2, 6, 7, 5, 4, 3, 2, 7, 8, 7, 9, 2, 2, 8, 11,
 	3, 2, 2, 2, 9, 11, 7, 9, 2, 2, 10, 6, 3, 2, 2, 2, 10, 9, 3, 2, 2, 2, 11,
 	3, 3, 2, 2, 2, 12, 13, 8, 3, 1, 2, 13, 14, 7, 8, 2, 2, 14, 15, 8, 3, 1,
@@ -71,11 +71,13 @@ func NewExprParser(input antlr.TokenStream) *ExprParser {
 }
 
 func eval(left int, op antlr.Token, right int) int {
-	if op.GetText() == "*" {
+	if op.GetTokenType() == ExprParserMUL {
 		return left * right
-	} else if op.GetText() == "+" {
+	} else if op.GetTokenType() == ExprParserDIV {
+		return left / right
+	} else if op.GetTokenType() == ExprParserADD {
 		return left + right
-	} else if op.GetText() == "-" {
+	} else if op.GetTokenType() == ExprParserSUB {
 		return left - right
 	} else {
 		return 0
@@ -338,6 +340,14 @@ func (s *EContext) SUB() antlr.TerminalNode {
 	return s.GetToken(ExprParserSUB, 0)
 }
 
+func (s *EContext) MUL() antlr.TerminalNode {
+	return s.GetToken(ExprParserMUL, 0)
+}
+
+func (s *EContext) DIV() antlr.TerminalNode {
+	return s.GetToken(ExprParserDIV, 0)
+}
+
 func (s *EContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
@@ -425,7 +435,7 @@ func (p *ExprParser) e(_p int) (localctx IEContext) {
 
 				_la = p.GetTokenStream().LA(1)
 
-				if !(_la == ExprParserADD || _la == ExprParserSUB) {
+				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<ExprParserMUL)|(1<<ExprParserDIV)|(1<<ExprParserADD)|(1<<ExprParserSUB))) != 0) {
 					var _ri = p.GetErrorHandler().RecoverInline(p)
 
 					localctx.(*EContext).op = _ri
@@ -443,7 +453,8 @@ func (p *ExprParser) e(_p int) (localctx IEContext) {
 			}
 
 			localctx.(*EContext).v = eval(localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp(), localctx.(*EContext).GetB().GetV())
-			fmt.Fprintf(os.Stdout, "got args=%d %d\n", localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetB().GetV())
+			fmt.Fprintf(os.Stdout, "%d %s %d = %d\n",
+				localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp().GetText(), localctx.(*EContext).GetB().GetV(), localctx.(*EContext).v)
 
 		}
 		p.SetState(23)
