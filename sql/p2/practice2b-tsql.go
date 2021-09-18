@@ -27,20 +27,6 @@ INNER JOIN HUMANRESOURCES.EMPLOYEE E
 ON C.BUSINESSENTITYID = E.BUSINESSENTITYID
 JOIN SALES.SALESPERSON S 
 ON E.BUSINESSENTITYID = S.BUSINESSENTITYID
-
-SELECT LastName, FirstName
-FROM Person.Person c
-INNER JOIN HumanResources.Employee e
-ON c.BusinessEntityID = e.BusinessEntityID
-JOIN Sales.SalesPerson s 
-ON e.BusinessEntityID = s.BusinessEntityID
-
-SELECT [Name]
-FROM Production.Product
-WHERE ListPrice =
-    (SELECT ListPrice
-     FROM Production.Product
-     WHERE [Name] = 'Chainring Bolts' )
 `
 
 // ExitTable_name is called when production table_name is exited.
@@ -66,7 +52,7 @@ func main() {
 
 	// Finally parse the expression (by walking the tree)
 	listener := tsqlListener{}
-	antlr.ParseTreeWalkerDefault.Walk(&listener, p.Dml_clause())
+	antlr.ParseTreeWalkerDefault.Walk(&listener, p.Tsql_file())
 }
 
 /*

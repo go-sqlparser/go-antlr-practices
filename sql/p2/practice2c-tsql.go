@@ -14,13 +14,14 @@ type tsqlListener struct {
 	parser *tsql.TSqlParser
 }
 
-// ExitEveryRule is called when any rule is exited.
-func (s *tsqlListener) ExitEveryRule(ctx antlr.ParserRuleContext) {
-	//fmt.Printf("%#v\n", ctx)
-	rc := ctx.GetRuleContext()
-	ri := rc.GetRuleIndex()
-	//fmt.Printf("%#v\n", rc)
-	fmt.Printf("%s (%s)\n", s.parser.RuleNames[ri], ctx.GetText())
+// ExitTable_name is called when production table_name is exited.
+func (s *tsqlListener) ExitTable_name(ctx *tsql.Table_nameContext) {
+	fmt.Printf("%s\n", ctx.GetText())
+}
+
+// ExitSelect_statement is called when production select_statement is exited.
+func (s *tsqlListener) ExitSelect_statement(ctx *tsql.Select_statementContext) {
+	fmt.Println()
 }
 
 func main() {
