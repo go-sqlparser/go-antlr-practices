@@ -5,8 +5,6 @@ ON C.BUSINESSENTITYID = E.BUSINESSENTITYID
 JOIN SALES.SALESPERSON S 
 ON E.BUSINESSENTITYID = S.BUSINESSENTITYID;
 
-/*
-
 -- https://docs.microsoft.com/en-us/sql/relational-databases/performance/subqueries?view=sql-server-ver15
 
 SELECT LastName, FirstName
@@ -90,5 +88,3 @@ WHERE cat.ProductCategoryID =
      FROM [AdventureWorks2014].[Production].[ProductCategory] cat
      WHERE cat.ProductCategoryID = 1
    )
-
-*/

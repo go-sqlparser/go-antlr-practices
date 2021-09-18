@@ -10,13 +10,12 @@ import (
 )
 
 func main() {
-	// Setup the input
-	// https://pkg.go.dev/github.com/antlr/antlr4/runtime/Go/antlr#NewFileStream
+	// Setup the case insensitive input streams
+	// https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md
 	is, _ := antlr.NewFileStream("../test-sample.sql")
-
+	upper := NewCaseChangingStream(is, true)
 	// Create the Lexer
-	// https://pkg.go.dev/github.com/go-sqlparser/antlr4-grammars
-	lexer := tsql.NewTSqlLexer(is)
+	lexer := tsql.NewTSqlLexer(upper)
 
 	// Read all tokens
 	for {
