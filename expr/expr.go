@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -15,7 +16,8 @@ func calc(inputfile string) {
 	lexer := parser.NewExprLexer(input)        // Create the Lexer
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p := parser.NewExprParser(stream) // Create the Parser
-	p.Stat()
+	result := p.Stat()
+	fmt.Printf("result=%#v\n", result)
 }
 
 func main() {

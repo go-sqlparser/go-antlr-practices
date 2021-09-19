@@ -23,9 +23,10 @@ func eval(left int, op antlr.Token, right int) int {
 }
 }
 
-stat:   e NEWLINE 
-    |   NEWLINE                   
-    ;
+stat returns [int V]
+ : a=e NEWLINE {$V = $a.v}
+ | NEWLINE     {$V = 0}
+ ;
 
 e returns [int v]
     : a=e op=('*'|'/') b=e  {
