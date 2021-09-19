@@ -2,7 +2,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"os"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
@@ -24,10 +26,22 @@ func (s *tsqlListener) ExitSelect_statement(ctx *tsql.Select_statementContext) {
 	fmt.Println()
 }
 
+func usage() {
+	// Fprintf allows us to print to a specifed file handle or stream
+	fmt.Fprintf(os.Stderr, "ste -- sql tabels extract\n\nUsage:\n  ste file.sql\n")
+	flag.PrintDefaults()
+	os.Exit(0)
+}
+
 func main() {
+	flag.Parse()
+	if len(flag.Args()) < 1 {
+		usage()
+	}
+
 	// Setup the case insensitive input streams
 	// https://github.com/antlr/antlr4/blob/master/doc/case-insensitive-lexing.md
-	is, _ := antlr.NewFileStream("../test-sample.sql")
+	is, _ := antlr.NewFileStream(flag.Args()[0])
 	upper := NewCaseChangingStream(is, true)
 	// Create the Lexer
 	lexer := tsql.NewTSqlLexer(upper)
@@ -44,7 +58,7 @@ func main() {
 
 /*
 
-$ go run practice2c-tsql.go case_changing_stream.go
+$ go run practice2e-tsql.go case_changing_stream.go ../test-sample.sql
 PERSON.PERSON
 HUMANRESOURCES.EMPLOYEE
 SALES.SALESPERSON
