@@ -23,19 +23,22 @@ func eval(left int, op antlr.Token, right int) int {
 }
 }
 
-stat:   e NEWLINE
+stat:   e NEWLINE 
     |   NEWLINE                   
     ;
 
 e returns [int v]
-    : a=e op=('+'|'-'|'*'|'/') b=e  {
+    : a=e op=('*'|'/') b=e  {
                 $v = eval($a.v, $op, $b.v)
-                fmt.Fprintf(os.Stdout, "%d %s %d = %d\n",
-			$a.v, $op.GetText(), $b.v, $v)
+                // fmt.Fprintf(os.Stdout, "%d %s %d = %d\n", $a.v, $op.GetText(), $b.v, $v)
+                }
+    | a=e op=('+'|'-') b=e  {
+                $v = eval($a.v, $op, $b.v)
+                // fmt.Fprintf(os.Stdout, "%d %s %d = %d\n", $a.v, $op.GetText(), $b.v, $v)
                 }
     | INT                   {
                 $v = $INT.int
-                fmt.Fprintf(os.Stdout, "got number=%d\n", $v)
+                // fmt.Fprintf(os.Stdout, "got number=%d\n", $v)
                 }    
     ; 
 
