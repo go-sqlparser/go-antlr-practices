@@ -7,8 +7,6 @@ import (
 	"reflect"
 	"strconv"
 
-	"os"
-
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
@@ -18,17 +16,20 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 10, 27, 4,
-	2, 9, 2, 4, 3, 9, 3, 3, 2, 3, 2, 3, 2, 3, 2, 5, 2, 11, 10, 2, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 3, 22, 10, 3, 12, 3, 14,
-	3, 25, 11, 3, 3, 3, 2, 3, 4, 4, 2, 4, 2, 3, 3, 2, 3, 6, 2, 26, 2, 10, 3,
-	2, 2, 2, 4, 12, 3, 2, 2, 2, 6, 7, 5, 4, 3, 2, 7, 8, 7, 9, 2, 2, 8, 11,
-	3, 2, 2, 2, 9, 11, 7, 9, 2, 2, 10, 6, 3, 2, 2, 2, 10, 9, 3, 2, 2, 2, 11,
-	3, 3, 2, 2, 2, 12, 13, 8, 3, 1, 2, 13, 14, 7, 8, 2, 2, 14, 15, 8, 3, 1,
-	2, 15, 23, 3, 2, 2, 2, 16, 17, 12, 4, 2, 2, 17, 18, 9, 2, 2, 2, 18, 19,
-	5, 4, 3, 5, 19, 20, 8, 3, 1, 2, 20, 22, 3, 2, 2, 2, 21, 16, 3, 2, 2, 2,
-	22, 25, 3, 2, 2, 2, 23, 21, 3, 2, 2, 2, 23, 24, 3, 2, 2, 2, 24, 5, 3, 2,
-	2, 2, 25, 23, 3, 2, 2, 2, 4, 10, 23,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 10, 34, 4,
+	2, 9, 2, 4, 3, 9, 3, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 5, 2, 13, 10,
+	2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 7, 3, 29, 10, 3, 12, 3, 14, 3, 32, 11, 3, 3, 3, 2, 3, 4,
+	4, 2, 4, 2, 4, 3, 2, 3, 4, 3, 2, 5, 6, 2, 34, 2, 12, 3, 2, 2, 2, 4, 14,
+	3, 2, 2, 2, 6, 7, 5, 4, 3, 2, 7, 8, 7, 9, 2, 2, 8, 9, 8, 2, 1, 2, 9, 13,
+	3, 2, 2, 2, 10, 11, 7, 9, 2, 2, 11, 13, 8, 2, 1, 2, 12, 6, 3, 2, 2, 2,
+	12, 10, 3, 2, 2, 2, 13, 3, 3, 2, 2, 2, 14, 15, 8, 3, 1, 2, 15, 16, 7, 8,
+	2, 2, 16, 17, 8, 3, 1, 2, 17, 30, 3, 2, 2, 2, 18, 19, 12, 5, 2, 2, 19,
+	20, 9, 2, 2, 2, 20, 21, 5, 4, 3, 6, 21, 22, 8, 3, 1, 2, 22, 29, 3, 2, 2,
+	2, 23, 24, 12, 4, 2, 2, 24, 25, 9, 3, 2, 2, 25, 26, 5, 4, 3, 5, 26, 27,
+	8, 3, 1, 2, 27, 29, 3, 2, 2, 2, 28, 18, 3, 2, 2, 2, 28, 23, 3, 2, 2, 2,
+	29, 32, 3, 2, 2, 2, 30, 28, 3, 2, 2, 2, 30, 31, 3, 2, 2, 2, 31, 5, 3, 2,
+	2, 2, 32, 30, 3, 2, 2, 2, 5, 12, 28, 30,
 }
 var literalNames = []string{
 	"", "'*'", "'/'", "'+'", "'-'",
@@ -110,6 +111,18 @@ type IStatContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetA returns the a rule contexts.
+	GetA() IEContext
+
+	// SetA sets the a rule contexts.
+	SetA(IEContext)
+
+	// GetV returns the v attribute.
+	GetV() int
+
+	// SetV sets the v attribute.
+	SetV(int)
+
 	// IsStatContext differentiates from other interfaces.
 	IsStatContext()
 }
@@ -117,6 +130,8 @@ type IStatContext interface {
 type StatContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
+	v      int
+	a      IEContext
 }
 
 func NewEmptyStatContext() *StatContext {
@@ -141,6 +156,18 @@ func NewStatContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *StatContext) GetParser() antlr.Parser { return s.parser }
 
+func (s *StatContext) GetA() IEContext { return s.a }
+
+func (s *StatContext) SetA(v IEContext) { s.a = v }
+
+func (s *StatContext) GetV() int { return s.v }
+
+func (s *StatContext) SetV(v int) { s.v = v }
+
+func (s *StatContext) NEWLINE() antlr.TerminalNode {
+	return s.GetToken(ExprParserNEWLINE, 0)
+}
+
 func (s *StatContext) E() IEContext {
 	var t = s.GetTypedRuleContext(reflect.TypeOf((*IEContext)(nil)).Elem(), 0)
 
@@ -149,10 +176,6 @@ func (s *StatContext) E() IEContext {
 	}
 
 	return t.(IEContext)
-}
-
-func (s *StatContext) NEWLINE() antlr.TerminalNode {
-	return s.GetToken(ExprParserNEWLINE, 0)
 }
 
 func (s *StatContext) GetRuleContext() antlr.RuleContext {
@@ -183,7 +206,7 @@ func (p *ExprParser) Stat() (localctx IStatContext) {
 		}
 	}()
 
-	p.SetState(8)
+	p.SetState(10)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
@@ -191,19 +214,24 @@ func (p *ExprParser) Stat() (localctx IStatContext) {
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(4)
-			p.e(0)
+
+			var _x = p.e(0)
+
+			localctx.(*StatContext).a = _x
 		}
 		{
 			p.SetState(5)
 			p.Match(ExprParserNEWLINE)
 		}
+		localctx.(*StatContext).v = localctx.(*StatContext).GetA().GetV()
 
 	case ExprParserNEWLINE:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(7)
+			p.SetState(8)
 			p.Match(ExprParserNEWLINE)
 		}
+		localctx.(*StatContext).v = 0
 
 	default:
 		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
@@ -332,20 +360,20 @@ func (s *EContext) E(i int) IEContext {
 	return t.(IEContext)
 }
 
-func (s *EContext) ADD() antlr.TerminalNode {
-	return s.GetToken(ExprParserADD, 0)
-}
-
-func (s *EContext) SUB() antlr.TerminalNode {
-	return s.GetToken(ExprParserSUB, 0)
-}
-
 func (s *EContext) MUL() antlr.TerminalNode {
 	return s.GetToken(ExprParserMUL, 0)
 }
 
 func (s *EContext) DIV() antlr.TerminalNode {
 	return s.GetToken(ExprParserDIV, 0)
+}
+
+func (s *EContext) ADD() antlr.TerminalNode {
+	return s.GetToken(ExprParserADD, 0)
+}
+
+func (s *EContext) SUB() antlr.TerminalNode {
+	return s.GetToken(ExprParserSUB, 0)
 }
 
 func (s *EContext) GetRuleContext() antlr.RuleContext {
@@ -390,7 +418,7 @@ func (p *ExprParser) e(_p int) (localctx IEContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(11)
+		p.SetState(13)
 
 		var _m = p.Match(ExprParserINT)
 
@@ -405,12 +433,12 @@ func (p *ExprParser) e(_p int) (localctx IEContext) {
 			return i
 		}
 	}())
-	fmt.Fprintf(os.Stdout, "got number=%d\n", localctx.(*EContext).v)
+	// fmt.Fprintf(os.Stdout, "got number=%d\n", localctx.(*EContext).v)
 
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(21)
+	p.SetState(28)
 	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
+	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext())
 
 	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 		if _alt == 1 {
@@ -418,48 +446,91 @@ func (p *ExprParser) e(_p int) (localctx IEContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			localctx = NewEContext(p, _parentctx, _parentState)
-			localctx.(*EContext).a = _prevctx
-			p.PushNewRecursionContext(localctx, _startState, ExprParserRULE_e)
-			p.SetState(14)
-
-			if !(p.Precpred(p.GetParserRuleContext(), 2)) {
-				panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
-			}
-			{
-				p.SetState(15)
-
-				var _lt = p.GetTokenStream().LT(1)
-
-				localctx.(*EContext).op = _lt
-
-				_la = p.GetTokenStream().LA(1)
-
-				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<ExprParserMUL)|(1<<ExprParserDIV)|(1<<ExprParserADD)|(1<<ExprParserSUB))) != 0) {
-					var _ri = p.GetErrorHandler().RecoverInline(p)
-
-					localctx.(*EContext).op = _ri
-				} else {
-					p.GetErrorHandler().ReportMatch(p)
-					p.Consume()
-				}
-			}
-			{
+			p.SetState(26)
+			p.GetErrorHandler().Sync(p)
+			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext()) {
+			case 1:
+				localctx = NewEContext(p, _parentctx, _parentState)
+				localctx.(*EContext).a = _prevctx
+				p.PushNewRecursionContext(localctx, _startState, ExprParserRULE_e)
 				p.SetState(16)
 
-				var _x = p.e(3)
+				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
+					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 3)", ""))
+				}
+				{
+					p.SetState(17)
 
-				localctx.(*EContext).b = _x
+					var _lt = p.GetTokenStream().LT(1)
+
+					localctx.(*EContext).op = _lt
+
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == ExprParserMUL || _la == ExprParserDIV) {
+						var _ri = p.GetErrorHandler().RecoverInline(p)
+
+						localctx.(*EContext).op = _ri
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(18)
+
+					var _x = p.e(4)
+
+					localctx.(*EContext).b = _x
+				}
+
+				localctx.(*EContext).v = eval(localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp(), localctx.(*EContext).GetB().GetV())
+				// fmt.Fprintf(os.Stdout, "%d %s %d = %d\n", localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp().GetText(), localctx.(*EContext).GetB().GetV(), localctx.(*EContext).v)
+
+			case 2:
+				localctx = NewEContext(p, _parentctx, _parentState)
+				localctx.(*EContext).a = _prevctx
+				p.PushNewRecursionContext(localctx, _startState, ExprParserRULE_e)
+				p.SetState(21)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
+					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
+				}
+				{
+					p.SetState(22)
+
+					var _lt = p.GetTokenStream().LT(1)
+
+					localctx.(*EContext).op = _lt
+
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == ExprParserADD || _la == ExprParserSUB) {
+						var _ri = p.GetErrorHandler().RecoverInline(p)
+
+						localctx.(*EContext).op = _ri
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+				{
+					p.SetState(23)
+
+					var _x = p.e(3)
+
+					localctx.(*EContext).b = _x
+				}
+
+				localctx.(*EContext).v = eval(localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp(), localctx.(*EContext).GetB().GetV())
+				// fmt.Fprintf(os.Stdout, "%d %s %d = %d\n", localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp().GetText(), localctx.(*EContext).GetB().GetV(), localctx.(*EContext).v)
+
 			}
 
-			localctx.(*EContext).v = eval(localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp(), localctx.(*EContext).GetB().GetV())
-			fmt.Fprintf(os.Stdout, "%d %s %d = %d\n",
-				localctx.(*EContext).GetA().GetV(), localctx.(*EContext).GetOp().GetText(), localctx.(*EContext).GetB().GetV(), localctx.(*EContext).v)
-
 		}
-		p.SetState(23)
+		p.SetState(30)
 		p.GetErrorHandler().Sync(p)
-		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
+		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext())
 	}
 
 	return localctx
@@ -482,6 +553,9 @@ func (p *ExprParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex in
 func (p *ExprParser) E_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
 	case 0:
+		return p.Precpred(p.GetParserRuleContext(), 3)
+
+	case 1:
 		return p.Precpred(p.GetParserRuleContext(), 2)
 
 	default:

@@ -17,7 +17,8 @@ func calc(inputfile string) {
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p := parser.NewExprParser(stream) // Create the Parser
 	result := p.Stat()
-	fmt.Printf("result=%#v\n", result)
+	fmt.Fprintf(os.Stderr, "%s", result.GetText())
+	fmt.Printf("%d\n", result.GetV())
 }
 
 func main() {
